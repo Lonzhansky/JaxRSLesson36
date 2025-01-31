@@ -5,50 +5,97 @@ import entity.User;
 import jakarta.inject.Inject;
 import repository.user.UserRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class UserServiceImpl implements UserService {
 
+    // Анотація @Inject для вбудування (ін'єкції)
+    // об'єкту репозиторія в цей клас
     @Inject
-    private UserRepository userRepository;
+    private UserRepository repository;
 
     @Override
     public User create(UserDtoRequest request) {
-
-        Objects.requireNonNull(request, "Parameter [request] must be not null!");
-        userRepository.save(request);
-
-        return userRepository.getLastEntity().orElse(null);
+        Objects.requireNonNull(request,
+                "Parameter [request] must not be null!");
+        repository.save(request);
+        return repository.getLastEntity()
+                .orElse(null);
     }
 
     @Override
     public List<User> getAll() {
-        return List.of();
+        return repository.getAll()
+                .orElse(Collections.emptyList());
     }
+
+    // ---- Path Params ----------------------
 
     @Override
     public User getById(Long id) {
-        return null;
+        Objects.requireNonNull(id,
+                "Parameter [id] must not be null!");
+        return repository.getById(id).orElse(null);
     }
 
     @Override
     public User update(Long id, UserDtoRequest request) {
-        return null;
+        Objects.requireNonNull(request,
+                "Parameter [request] must not be null!");
+        if (id == null) {
+            throw new IllegalArgumentException("Id must be provided!");
+        }
+        if (repository.getById(id).isPresent()) {
+            repository.update(id, request);
+        }
+        return repository.getById(id).orElse(null);
     }
 
     @Override
     public boolean deleteById(Long id) {
+        Objects.requireNonNull(id,
+                "Parameter [id] must not be null!");
+        if (repository.getById(id).isPresent()) {
+            repository.deleteById(id);
+            return true;
+        }
         return false;
     }
 
-    @Override
+    // ---- Query Params ----------------------
+
     public List<User> fetchByFirstName(String firstName) {
-        return List.of();
+        return repository.fetchByFirstName(firstName)
+                .orElse(Collections.emptyList());
     }
 
-    @Override
-    public List<User> fetchByLstName(String lastName) {
-        return List.of();
+    public List<User> fetchByLastName(String lastName) {
+        return repository.fetchByLastName(lastName)
+                .orElse(Collections.emptyList());
+    }
+
+    public List<User> fetchAllOrderBy(String orderBy) {
+        return repository.fetchAllOrderBy(orderBy)
+                .orElse(Collections.emptyList());
+    }
+
+    public List<User> fetchByLastNameOrderBy(String lastName,
+                                             String orderBy) {
+        return repository.fetchByLastNameOrderBy(lastName,
+                orderBy).orElse(Collections.emptyList());
+    }
+
+    public List<User> fetchBetweenIds(int from, int to) {
+        return repository.fetchBetweenIds(from, to)
+                .orElse(Collections.emptyList());
+    }
+
+    public List<User> fetchLastNameIn(String lastName1,
+                                      String lastName2) {
+        return repository.fetchLastNameIn(lastName1,
+                        lastName2)
+                .orElse(Collections.emptyList());
     }
 }

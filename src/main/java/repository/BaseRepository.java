@@ -11,7 +11,7 @@ public interface BaseRepository<T, S> {
 
     Optional<T> getById(Long id);
 
-    T update(Long id, S request);
+    void update(Long id, S request);
 
     boolean deleteById(Long id);
 }
